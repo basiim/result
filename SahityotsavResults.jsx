@@ -565,22 +565,12 @@ export default function App() {
   const EMPTY_FORM = {
     category: "Senior", isGirls: false, competition: "", resultNum: 1,
     participants: [
-      { name: "", place: "Adivaram", grade: "10" },
-      { name: "", place: "Poolakkathadam", grade: "10" },
-      { name: "", place: "Millumpadi", grade: "10" },
+      { name: "", place: "Adivaram", grade: "" },
+      { name: "", place: "Poolakkathadam", grade: "" },
+      { name: "", place: "Millumpadi", grade: "" },
     ],
   };
-  const DEMO_FORM = {
-    category: "Senior", isGirls: false,
-    competition: "E-Poster Designing",
-    resultNum: 1,
-    participants: [
-      { name: "Amina K", place: "Adivaram", grade: "10" },
-      { name: "Basila P", place: "Poolakkathadam", grade: "9" },
-      { name: "Fathima S", place: "Millumpadi", grade: "11" },
-    ],
-  };
-  const [form, setForm] = useState(DEMO_FORM);
+  const [form, setForm] = useState(EMPTY_FORM);
   const [hist, setHist] = useState([]);
   const [preview, setPreview] = useState(null);
   const [busy, setBusy] = useState(false);
