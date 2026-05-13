@@ -336,12 +336,6 @@ async function renderPoster(canvas, data) {
     ctx.fillStyle = DARK;
     ctx.fillText(p.place.toUpperCase(), 230, ry + 60);
     ctx.restore();
-
-    ctx.save();
-    ctx.font = '500 20px "Alexandria",sans-serif';
-    ctx.fillStyle = "#5a6e68";
-    ctx.fillText(`Gr: ${p.grade || "-"}`, 230, ry + 86);
-    ctx.restore();
   });
 
 }
@@ -385,7 +379,7 @@ function Row({ label, children }) {
   );
 }
 
-function HistoryTab({ hist, onDelete, onDeleteAll }) {
+function HistoryTab({ hist, onDelete, onDeleteAll, onDownload }) {
   if (!hist.length)
     return (
       <div style={{ textAlign: "center", padding: "60px 20px", color: "#a09080" }}>
@@ -450,19 +444,36 @@ function HistoryTab({ hist, onDelete, onDeleteAll }) {
                   </div>
                 ))}
             </div>
-            <button
-              onClick={() => onDelete(r.id)}
-              style={{
-                background: "#fce8e8", border: "1.5px solid #f5c8c8",
-                borderRadius: 8, cursor: "pointer",
-                color: "#c44", fontSize: 16, fontWeight: 700,
-                width: 32, height: 32, flexShrink: 0, alignSelf: "flex-start",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "background .15s",
-              }}
-              onMouseEnter={(e) => { e.target.style.background = "#f5d0d0"; e.target.style.color = "#a22"; }}
-              onMouseLeave={(e) => { e.target.style.background = "#fce8e8"; e.target.style.color = "#c44"; }}
-            >✕</button>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0 }}>
+              <button
+                onClick={() => onDownload(r)}
+                style={{
+                  background: "#e8f0ea", border: "1.5px solid #c8d8d0",
+                  borderRadius: 8, cursor: "pointer",
+                  color: DARK, fontSize: 14, fontWeight: 700,
+                  width: 32, height: 32,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "background .15s",
+                }}
+                onMouseEnter={(e) => { e.target.style.background = "#d0e0d8"; }}
+                onMouseLeave={(e) => { e.target.style.background = "#e8f0ea"; }}
+                title="Download PNG"
+              >⬇</button>
+              <button
+                onClick={() => onDelete(r.id)}
+                style={{
+                  background: "#fce8e8", border: "1.5px solid #f5c8c8",
+                  borderRadius: 8, cursor: "pointer",
+                  color: "#c44", fontSize: 16, fontWeight: 700,
+                  width: 32, height: 32,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "background .15s",
+                }}
+                onMouseEnter={(e) => { e.target.style.background = "#f5d0d0"; e.target.style.color = "#a22"; }}
+                onMouseLeave={(e) => { e.target.style.background = "#fce8e8"; e.target.style.color = "#c44"; }}
+                title="Delete"
+              >✕</button>
+            </div>
           </div>
         ))}
       </div>
@@ -656,6 +667,23 @@ export default function App() {
 
   const handleDeleteAll = async () => {
     await saveHist([]);
+  };
+
+  const handleDownloadFromHistory = async (rec) => {
+    if (!cvs.current) return;
+    const formData = {
+      category: rec.category.replace(" (Girls)", ""),
+      isGirls: rec.category.includes("(Girls)"),
+      competition: rec.competition,
+      resultNum: rec.resultNum,
+      participants: rec.participants.map((p) => ({ ...p })),
+    };
+    await renderPoster(cvs.current, formData);
+    const dataUrl = cvs.current.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.download = `result_${String(rec.resultNum).padStart(2, "0")}_${rec.category.replace(/\s+/g, "_")}.png`;
+    a.href = dataUrl;
+    a.click();
   };
 
   // Stats computation
@@ -862,7 +890,7 @@ export default function App() {
 
         {/* ── HISTORY TAB ──────────────────────────────────────────────── */}
         {tab === "history" && (
-          <HistoryTab hist={hist} onDelete={delRec} onDeleteAll={handleDeleteAll} />
+          <HistoryTab hist={hist} onDelete={delRec} onDeleteAll={handleDeleteAll} onDownload={handleDownloadFromHistory} />
         )}
 
         {/* ── STATS TAB ────────────────────────────────────────────────── */}
