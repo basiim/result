@@ -646,7 +646,6 @@ export default function App() {
       };
       const nh = [rec, ...hist];
       await saveHist(nh);
-      upd("resultNum", form.resultNum + 1);
     } finally {
       setBusy(false);
     }
