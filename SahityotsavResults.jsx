@@ -638,7 +638,7 @@ export default function App() {
       const thumb = tc.toDataURL("image/jpeg", 0.6);
       const rec = {
         id: Date.now(),
-        resultNum: form.resultNum,
+        resultNum: form.resultNum || 1,
         category: form.category + (form.isGirls ? " (Girls)" : ""),
         competition: form.competition,
         participants: form.participants.map((p) => ({ ...p })),
@@ -812,8 +812,14 @@ export default function App() {
             <Card title="EVENT DETAILS">
               <Row label="Result #">
                 <input
-                  type="number" min={1} value={form.resultNum}
-                  onChange={(e) => upd("resultNum", parseInt(e.target.value) || 1)}
+                  type="text" inputMode="numeric"
+                  value={form.resultNum === "" ? "" : String(form.resultNum)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "") return upd("resultNum", "");
+                    const n = parseInt(v, 10);
+                    if (!isNaN(n)) upd("resultNum", n);
+                  }}
                   style={INP}
                 />
               </Row>
